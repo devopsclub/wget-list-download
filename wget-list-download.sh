@@ -35,6 +35,42 @@ function CheckParam(){
 	fi
 }
 
+function GetScreenInstallStatus(){
+	screenPkgName=screen
+	if dpkg --get-selections | grep -q "^$screenPkgName[[:space:]]*install$" >/dev/null; then # Check if user has the "screen" package installed. 
+		return 0;
+	else 
+		return 1;
+	fi
+}
+
+# Check if this script is already in a Screen session.
+function AskForScreen(){
+	if GetScreenInstallStatus; then # If the screen package is installed. 
+		if [ ! -n "$STY" ]; then # If this script isn't in a Screen session.
+			while true; do
+				read -p "Do you want to re-open this script in a Screen session? (y/n) " -e screenSession # Ask for user input.
+				case $screenSession in
+					[Yy]* ) ReopenInScreen;; # If we do want to run in a Screen Session.
+					[Nn]* ) printf "\n" && break;; # If we don't, just continue.
+					* ) printf "\nInvalid input\n";;
+				esac
+			done
+		else # If this script is in a Screen session.
+			printf "Screen usage:\n"
+			printf "  To detach from a Screen session: CTRL A, then CTRL D\n"
+			printf "  To re-attach to this Screen session: 'screen -r wget-list-download'\n\n"
+		fi
+	else 
+		return # If screen isn't installed, just return and run without screen functions. 
+	fi
+}
+
+function ReopenInScreen(){
+	exec screen -L -Logfile "$downloadList-wget-list-download.log" -S wget-list-download /bin/bash "$0" "$downloadList"; # Start a new instance of this script with same parameters within a Screen session... 
+	exit 0 # ... and exit this instance. 
+}
+
 function DownloadFiles(){
 	if [ ! -z "$downloadList" ]; then # Check that the $downloadList variable isn't empty. 
 		while IFS=' | ' read -r fileName url; do
@@ -46,5 +82,6 @@ function DownloadFiles(){
 }
 
 CheckParam $@ # Check the parameters supplied, with all script paramaters as an input.
+AskForScreen # Check if the user has the screen package installed. If so, ask if they want to run this script is a Screen session.
 DownloadFiles # Download the files. 
 exit 0
