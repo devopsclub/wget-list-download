@@ -6,7 +6,7 @@ Bash script to download and rename items from a file using wget.
 ./wget-list-download.sh -l [pathToListFile]
 
 ### List file:
-File format: filename.ext|download-url
+File format: <filename.ext>|<download-url>
 
 ###### Example: 
 	nameOfMyDownload.Extension|https://thingIWantToDownload
