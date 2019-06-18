@@ -2,6 +2,10 @@
 
 Bash script to download and rename items from a file using wget. 
 
+### To Download:
+	wget 'https://raw.githubusercontent.com/falling-fading/wget-list-download/master/wget-list-download.sh'
+	chmod +x ./wget-list-download.sh 
+
 ### Usage:
 ./wget-list-download.sh -l [pathToListFile]
 
